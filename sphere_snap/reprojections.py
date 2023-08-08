@@ -52,6 +52,23 @@ def cubemap2equi(cubemap_faces, out_hw=None):
                                                 merge_method="max")
     return out_equi
 
+def cubemap2hequi(cubemap_faces, out_hw=None):
+    """
+    Converts image from cubemap into half equirectangular
+    :param cubemap_faces:  a list of 6 images representing cubemap faces [ f, l, r, b, t, b]
+    :param out_hw:  [optional] image resolution
+    Returns half equirectangular image as numpy array
+    """
+    face_size = cubemap_faces[0].shape[0]
+    equi_hw = out_hw if out_hw is not None else np.array([2*face_size, 2*face_size]).astype(int)
+    cube_configs = get_cube_map_faces(face_size=face_size, source_img_hw=equi_hw)
+    cube_faces_snaps = [SphereSnap(c) for c in cube_configs]
+    out_equi = SphereSnap.merge_multiple_snaps( equi_hw, 
+                                                cube_faces_snaps, # snap object specifies destination position
+                                                cubemap_faces, # snap image contains planar image pixels
+                                                target_type=ImageProjectionType.HALF_EQUI, # destination image type
+                                                merge_method="max")
+    return out_equi
 
 def cubemap2fisheye(cubemap_faces, h_angle_offset = 0, out_hw=None):
     """

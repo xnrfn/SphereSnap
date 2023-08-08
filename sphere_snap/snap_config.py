@@ -6,6 +6,7 @@ from enum import Enum
 
 class ImageProjectionType(Enum):
     EQUI = 'equirectangular'
+    HALF_EQUI = 'half_equirectangular'
     PINHOLE = 'pinhole'
     FISHEYE_180 = 'fisheye180'
     RADIAL_DISTORTED = 'distorted_pinhole'

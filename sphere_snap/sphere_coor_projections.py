@@ -43,6 +43,20 @@ def equi_coor2spherical(coorxy, hw, np=npy):
     theta = ((coor_y + 0.5) / h - 0.5) * np.pi
     return np.concatenate([phi, theta], axis=-1)
 
+@custom_cupy_wrap(convert_to_cupy, convert_to_numpy)
+def halfequi_coor2spherical(coorxy, hw, np=npy):
+    """
+    Converts from half equirectangular coordinates to spherical coordinates
+    The origin (0, 0) of the half-equirectangular image is in the top left corner.
+    The input order is (horizontal, vertical).
+    The return order is (phi, theta).
+    """
+    h,w = hw
+    coor_x, coor_y = np.split(coorxy, 2, axis=-1)
+    phi   = ((coor_x + 0.5) / w - 0.5) * np.pi
+    theta = ((coor_y + 0.5) / h - 0.5) * np.pi
+    return np.concatenate([phi, theta], axis=-1)
+
 
 @custom_cupy_wrap(convert_to_cupy, convert_to_numpy)
 def fisheye180_coor2xyz(coorxy, hw, return_excluded_indices=False, np=npy):
@@ -230,6 +244,23 @@ def equi_spherical2coor(spherical, output_hw, np=npy):
     phi, theta = np.split(spherical, 2, axis=-1)
     # (phi, theta) = (0, 0) corresponds to center of equi image
     coor_x = (phi / (2 * np.pi) + 0.5) * w - 0.5
+    coor_y = (theta / np.pi + 0.5) * h - 0.5
+    return np.concatenate([coor_x, coor_y], axis=-1)
+
+@custom_cupy_wrap(convert_to_cupy, convert_to_numpy)
+def halfequi_spherical2coor(spherical, output_hw, np=npy):
+    """ 
+    For each pixel visible in the view image this function
+        returns the pixel's coordinates in the source half-equirectangular image
+
+    The order of coordinates in `spherical` is (phi, theta).
+    The order of coordinates in the output is (horizontal=along width, vertical=along height).
+    """
+    h = output_hw[0]
+    w = output_hw[1]
+    phi, theta = np.split(spherical, 2, axis=-1)
+    # (phi, theta) = (0, 0) corresponds to center of equi image
+    coor_x = (phi   / np.pi + 0.5) * w - 0.5
     coor_y = (theta / np.pi + 0.5) * h - 0.5
     return np.concatenate([coor_x, coor_y], axis=-1)
 

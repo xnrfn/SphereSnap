@@ -237,6 +237,8 @@ class SphereSnap:
 
         if snap_config.source_img_type == ImageProjectionType.EQUI:
             return sphere_proj.equi_coor2spherical._original(coors, s_hw, np=np)
+        elif snap_config.source_img_type == ImageProjectionType.HALF_EQUI:
+            return sphere_proj.halfequi_coor2spherical._original(coors, s_hw, np=np)
         elif snap_config.source_img_type == ImageProjectionType.FISHEYE_180:
             return sphere_proj.fisheye180_coor2spherical._original(coors, s_hw, np=np)
         elif snap_config.source_img_type == ImageProjectionType.RADIAL_DISTORTED:
@@ -287,6 +289,8 @@ class SphereSnap:
             return sphere_proj.fisheye180_spherical2coor._original(spherical, snap_config.source_img_hw, np=np)
         elif snap_config.source_img_type == ImageProjectionType.EQUI:
             return sphere_proj.equi_spherical2coor._original(spherical, snap_config.source_img_hw, np=np)
+        elif snap_config.source_img_type == ImageProjectionType.HALF_EQUI:
+            return sphere_proj.halfequi_spherical2coor._original(spherical, snap_config.source_img_hw, np=np)
         else:
             assert False, "Not implemented yet !"
 
@@ -322,7 +326,7 @@ class SphereSnap:
         #check output type
         out_type = imgs[0].dtype
         nb_channels = imgs[0].shape[2] if len(imgs[0].shape) > 2  else 1
-        target = np.zeros((output_hw[0], output_hw[1], nb_channels), np.float)
+        target = np.zeros((output_hw[0], output_hw[1], nb_channels), np.float32)
         cnt = np.zeros((output_hw[0], output_hw[1], 1), np.uint8)
         
         # construct image uv coordinates
